@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadUserProfile = async () => {
     try {
-      const response = await api.get("/auth/profile");
+      const response = await api.get("/api/auth/profile");
       setUser(response.data.user);
       setTenant(response.data.tenant);
     } catch (error) {
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await api.post("/auth/login", { email, password });
+      const response = await api.post("/api/auth/login", { email, password });
       const {
         token: newToken,
         user: userData,
@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (data: RegisterData) => {
     try {
-      const response = await api.post("/auth/register", data);
+      const response = await api.post("/api/auth/register", data);
       const {
         token: newToken,
         user: userData,
