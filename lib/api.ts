@@ -85,20 +85,21 @@ export const authService = {
 };
 
 export const tenantService = {
-  getCurrent: () => api.get("/tenants/current"),
+  getCurrent: () => api.get("/api/tenants/current"),
 
-  updateShopifyConfig: (data: any) => api.put("/tenants/shopify-config", data),
+  updateShopifyConfig: (data: any) =>
+    api.put("/api/tenants/shopify-config", data),
 
-  testShopifyConnection: () => api.post("/tenants/test-shopify"),
+  testShopifyConnection: () => api.post("/api/tenants/test-shopify"),
 
-  updateSettings: (data: any) => api.put("/tenants/settings", data),
+  updateSettings: (data: any) => api.put("/api/tenants/settings", data),
 
-  getUsers: () => api.get("/tenants/users"),
+  getUsers: () => api.get("/api/tenants/users"),
 
-  createUser: (data: any) => api.post("/tenants/users", data),
+  createUser: (data: any) => api.post("/api/tenants/users", data),
 
   updateUser: (userId: string, data: any) =>
-    api.put(`/tenants/users/${userId}`, data),
+    api.put(`/api/tenants/users/${userId}`, data),
 };
 
 export const dashboardService = {
