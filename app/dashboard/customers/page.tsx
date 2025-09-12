@@ -28,7 +28,7 @@ export default function CustomersPage() {
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/customers`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/customers`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

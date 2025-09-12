@@ -30,7 +30,7 @@ export default function SettingsPage() {
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/tenant`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/tenant`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ export default function SettingsPage() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/tenant`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/tenant`,
         {
           method: "PUT",
           headers: {

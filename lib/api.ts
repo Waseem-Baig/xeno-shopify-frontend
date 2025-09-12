@@ -121,17 +121,18 @@ export const dashboardService = {
 };
 
 export const syncService = {
-  start: (type?: string) => api.post("/sync/start", { type }),
+  start: (type?: string) => api.post("/api/sync/start", { type }),
 
-  getStatus: () => api.get("/sync/status"),
+  getStatus: () => api.get("/api/sync/status"),
 
-  getHistory: (params?: any) => api.get("/sync/history", { params }),
+  getHistory: (params?: any) => api.get("/api/sync/history", { params }),
 
-  getLog: (syncId: string) => api.get(`/sync/logs/${syncId}`),
+  getLog: (syncId: string) => api.get(`/api/sync/logs/${syncId}`),
 
-  cancel: () => api.post("/sync/cancel"),
+  cancel: () => api.post("/api/sync/cancel"),
 
-  getStatistics: () => api.get("/sync/statistics"),
+  getStatistics: () => api.get("/api/sync/statistics"),
 
-  controlScheduler: (action: string) => api.post(`/sync/scheduler/${action}`),
+  controlScheduler: (action: string) =>
+    api.post(`/api/sync/scheduler/${action}`),
 };

@@ -27,7 +27,7 @@ export default function SyncPage() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/sync/start`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/sync/start`,
         {
           method: "POST",
           headers: {
@@ -60,7 +60,7 @@ export default function SyncPage() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/sync/history`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/sync/history`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
