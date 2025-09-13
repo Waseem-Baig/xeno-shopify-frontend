@@ -567,7 +567,8 @@ For support, email waseem20032005@gmail.com or create an issue in this repositor
 
 ---
 
-**Built with ❤️ by the Wasee**
+**Built with ❤️ by the Waseem**
 
 ![Footer](https://img.shields.io/badge/Made_with-Next.js-black) ![Footer](https://img.shields.io/badge/Styled_with-TailwindCSS-38B2AC) ![Footer](https://img.shields.io/badge/Deployed_on-Vercel-black)
+
 
