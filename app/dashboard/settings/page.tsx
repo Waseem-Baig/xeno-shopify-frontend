@@ -11,6 +11,12 @@ interface Tenant {
   createdAt: string;
 }
 
+interface ConnectionStatus {
+  success: boolean;
+  data?: any;
+  error?: string;
+}
+
 export default function SettingsPage() {
   const { token, user } = useAuth();
   const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -23,6 +29,15 @@ export default function SettingsPage() {
     shopifyDomain: "",
     isActive: true,
   });
+
+  const [shopifyConfig, setShopifyConfig] = useState({
+    shopifyAccessToken: "",
+    shopifyDomain: "",
+  });
+
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [connectionStatus, setConnectionStatus] =
+    useState<ConnectionStatus | null>(null);
 
   useEffect(() => {
     const fetchTenant = async () => {
@@ -46,6 +61,10 @@ export default function SettingsPage() {
             name: data.name,
             shopifyDomain: data.shopifyDomain || "",
             isActive: data.isActive,
+          });
+          setShopifyConfig({
+            shopifyAccessToken: "",
+            shopifyDomain: data.shopifyDomain || "",
           });
         }
       } catch (err) {
@@ -99,6 +118,82 @@ export default function SettingsPage() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const handleShopifyConfigChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    setShopifyConfig((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleTestConnection = async () => {
+    if (!token || !shopifyConfig.shopifyAccessToken) return;
+
+    setTestingConnection(true);
+    setConnectionStatus(null);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/tenants/test-shopify`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        setConnectionStatus({ success: true, data: result });
+      } else {
+        const error = await response.json();
+        setConnectionStatus({ success: false, error: error.error });
+      }
+    } catch (err) {
+      setConnectionStatus({ success: false, error: "Connection test failed" });
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
+  const handleSaveShopifyConfig = async () => {
+    if (!token) return;
+
+    setUpdating(true);
+    setMessage("");
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/tenants/shopify-config`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(shopifyConfig),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        setMessage("Shopify configuration saved successfully!");
+        setConnectionStatus({ success: true, data: result });
+      } else {
+        const error = await response.json();
+        setMessage(`Error: ${error.error}`);
+      }
+    } catch (err) {
+      setMessage("Error saving Shopify configuration. Please try again.");
+    } finally {
+      setUpdating(false);
+    }
   };
 
   if (loading) {
@@ -349,6 +444,114 @@ export default function SettingsPage() {
               </h2>
             </div>
 
+            {/* Shopify Configuration Form */}
+            <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="text-sm">🔑</span>
+                API Configuration
+              </h3>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label
+                    htmlFor="shopifyDomain"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    Shopify Store Domain
+                  </label>
+                  <input
+                    type="text"
+                    id="shopifyDomain"
+                    name="shopifyDomain"
+                    value={shopifyConfig.shopifyDomain}
+                    onChange={handleShopifyConfigChange}
+                    placeholder="your-store.myshopify.com"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 backdrop-blur-sm transition-all duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="shopifyAccessToken"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    Admin API Access Token
+                  </label>
+                  <input
+                    type="password"
+                    id="shopifyAccessToken"
+                    name="shopifyAccessToken"
+                    value={shopifyConfig.shopifyAccessToken}
+                    onChange={handleShopifyConfigChange}
+                    placeholder="shpat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 backdrop-blur-sm transition-all duration-200"
+                  />
+                  <p className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+                    <span className="text-blue-500">💡</span>
+                    Get this from your Shopify Admin → Apps → Develop apps →
+                    [Your App] → API credentials
+                  </p>
+                </div>
+
+                <div className="flex gap-3 mt-4">
+                  <button
+                    type="button"
+                    onClick={handleTestConnection}
+                    disabled={
+                      testingConnection || !shopifyConfig.shopifyAccessToken
+                    }
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105"
+                  >
+                    {testingConnection ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Testing...
+                      </div>
+                    ) : (
+                      "🔍 Test Connection"
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveShopifyConfig}
+                    disabled={updating || !shopifyConfig.shopifyAccessToken}
+                    className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105"
+                  >
+                    {updating ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Saving...
+                      </div>
+                    ) : (
+                      "💾 Save Configuration"
+                    )}
+                  </button>
+                </div>
+
+                {connectionStatus && (
+                  <div
+                    className={`mt-4 p-4 rounded-xl border ${
+                      connectionStatus.success
+                        ? "bg-green-50 text-green-800 border-green-200"
+                        : "bg-red-50 text-red-800 border-red-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">
+                        {connectionStatus.success ? "✅" : "❌"}
+                      </span>
+                      {connectionStatus.success
+                        ? `Connected successfully! ${
+                            connectionStatus.data?.shop?.name || ""
+                          }`
+                        : `Connection failed: ${connectionStatus.error}`}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -362,13 +565,15 @@ export default function SettingsPage() {
                     </span>
                     <span
                       className={`inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full ${
-                        tenant?.shopifyDomain
+                        connectionStatus?.success
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      <span>{tenant?.shopifyDomain ? "🟢" : "🔴"}</span>
-                      {tenant?.shopifyDomain ? "Connected" : "Not Connected"}
+                      <span>{connectionStatus?.success ? "🟢" : "🔴"}</span>
+                      {connectionStatus?.success
+                        ? "Connected"
+                        : "Not Connected"}
                     </span>
                   </div>
 
