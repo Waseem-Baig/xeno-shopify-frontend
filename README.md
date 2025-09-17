@@ -563,10 +563,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email support@xeno-analytics.com or create an issue in this repository.
+For support, email waseem20032005@gmail.com or create an issue in this repository.
 
 ---
 
-**Built with ❤️ by the Xeno Team**
+**Built with ❤️ by the Waseem**
 
 ![Footer](https://img.shields.io/badge/Made_with-Next.js-black) ![Footer](https://img.shields.io/badge/Styled_with-TailwindCSS-38B2AC) ![Footer](https://img.shields.io/badge/Deployed_on-Vercel-black)
+
+
